@@ -1,22 +1,42 @@
-from textblob import TextBlob
+from transformers import pipeline
 
 class SentimentAnalyzer:
     def __init__(self):
         self.results=[]
-
+        print("Loading AI model....")
+        self.model=pipeline(
+            "sentiment-analysis",
+            model="distilbert-base-uncased-finetuned-sst-2-english"
+        )
+        print("Model ready!")
+    
     def analyze(self,text):
-        blob= TextBlob(text)
-        polarity = blob.sentiment.polarity
-
-        if polarity> 0.1:
-            sentiment="Positive ☺️"
-        elif polarity < -0.1:
-            sentiment="Negative 😳"
-        else:
-            sentiment="Neutral 😬"
-
-        return {
-            "text": text,
-            "sentiment": sentiment,
-            "score": round(polarity, 2)
-        }
+        if not text or len(text.strip())==0:
+            return{
+                "text": text,
+                "sentiment": "Neutral 😐",
+                "score": 0.0
+            }
+        
+        try:
+            result = self.model(text[:512])[0]
+            label = result["label"]
+            confidence = round(result["score"], 2)
+            
+            if label == "POSITIVE":
+                sentiment = "Positive 😊"
+            else:
+                sentiment = "Negative 😞"
+                
+            return {
+                "text": text,
+                "sentiment": sentiment,
+                "score": confidence
+            }
+            
+        except Exception as e:
+            return {
+                "text": text,
+                "sentiment": "Neutral 😐",
+                "score": 0.0
+            }

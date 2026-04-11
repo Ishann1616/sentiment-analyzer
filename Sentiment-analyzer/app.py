@@ -3,6 +3,7 @@ import pandas as pd
 import streamlit as st
 from news_fetcher import NewsFetcher
 from sentiment_analyzer import SentimentAnalyzer
+from rss_fetcher import RSSFetcher
 
 st.title("SentiScope")
 st.subheader("Analyze public sentiment on any topic")
@@ -18,6 +19,9 @@ if st.button("Analyze"):
             sa = SentimentAnalyzer()
 
             articles = nf.fetch(topic)
+            rf = RSSFetcher()
+            rss_articles = rf.fetch(topic)
+            articles = articles + rss_articles
 
             results = []
 
@@ -40,17 +44,17 @@ if st.button("Analyze"):
             "Count": [positive, negative, neutral]
             })
             
-            fig =px.pie(
+            fig = px.pie(
                 chart_data,
                 values="Count",
                 names="Sentiment",
                 title=f"Sentiment Breakdown for '{topic}'",
+                color="Sentiment",
                 color_discrete_map={
-                    "Positive": "#00C853",
-                    "Negative": "#D50000",
-                    "Neutral": "#FFD600"
+                    "Positive": "#00E676",
+                    "Negative": "#FF1744",
+                    "Neutral": "#90A4AE"
                 }
-
             )
             st.plotly_chart(fig)
 

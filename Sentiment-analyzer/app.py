@@ -54,9 +54,44 @@ if st.button("Analyze"):
             )
             st.plotly_chart(fig)
 
+            total= positive+negative+neutral
+            if total>0:
+                if positive > negative and positive>neutral:
+                    verdict=f"🟢 Public opinion on '{topic}' is mostly POSITIVE"
+                elif negative > positive and negative > neutral:
+                    verdict = f"🔴 Public opinion on '{topic}' is mostly NEGATIVE"
+                else:
+                    verdict = f"🟡 Public opinion on '{topic}' is mostly NEUTRAL"
+                
+            st.subheader(verdict)
+
             st.divider()
-            
+
+            positive_articles=[r for r in results if "Positive" in r["sentiment"]]
+            negative_articles=[r for r in results if "Negative" in r["sentiment"]]
+
+            col1,col2 = st.columns(2)
+
+            with col1:
+                st.subheader("🟢 Top Positive")
+                if positive_articles:
+                    for r in positive_articles[:3]:
+                        st.success(r["text"])
+                else:
+                    st.write("No positive articles found")
+
+            with col2:
+                st.subheader("🔴 Top Negative")
+                if negative_articles:
+                    for r in negative_articles[:3]:
+                        st.error(r["text"])
+                else:
+                    st.write("No negative articles found")
+
+            st.divider()
+            st.subheader("📰 All Articles")
             for r in results:
                 st.write(f"{r['sentiment']} | Score: {r['score']} | {r['text']}")
+
     else:
         st.warning("Please enter a topic!")

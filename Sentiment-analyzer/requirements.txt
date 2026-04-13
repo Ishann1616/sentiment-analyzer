@@ -1,6 +1,8 @@
-textblob
 streamlit
 pandas
+plotly
 requests
 newsapi-python
-praw
+textblob
+transformers
+torch
